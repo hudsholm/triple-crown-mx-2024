@@ -34,7 +34,7 @@ library(purrr)
 Importing rider information spreadsheet:
 
 ```{r}
-riders <- read.csv("/Users/hudsonholman/Documents/Work/Triple Crown Motocross/triple-crown-motocros-2024/rider_info.csv")
+riders <- read.csv("rider_info.csv")
 
 glimpse(riders)
 ```
@@ -389,13 +389,13 @@ Merge all three classes and then writing to a csv to save.
 
 ```{r}
 all_2024 <- bind_rows(all_2024_450, all_2024_250, all_2024_wmx)
-write.csv(all_2024,"/Users/hudsonholman/Documents/Work/Triple Crown Motocross/triple-crown-motocros-2024/all_2024.csv")
+write.csv(all_2024,"all_2024.csv")
 ```
 
 Join in rider information for a more complete dataset.
 
 ```{r}
-all_2024_cleaned <- read.csv("/Users/hudsonholman/Documents/Work/Triple Crown Motocross/triple-crown-motocros-2024/all_2024_cleaned.csv")
+all_2024_cleaned <- read.csv("all_2024_cleaned.csv")
 
 all_2024_complete <- all_2024_cleaned |>
   cross_join(riders) |>
@@ -407,7 +407,7 @@ all_2024_complete <- all_2024_cleaned |>
   rename(rider = name, year = year.x, class = class.x) |>
   mutate(date = ymd(date))
 
-write.csv(all_2024_complete,"/Users/hudsonholman/Documents/Work/Triple Crown Motocross/triple-crown-motocros-2024/all_2024_complete.csv")
+write.csv(all_2024_complete,"all_2024_complete.csv")
 
 ```
 
