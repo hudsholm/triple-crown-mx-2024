@@ -7,7 +7,7 @@ format:
 
 # 1 Abstract
 
-The Triple Crown Series is Canada's premier off-road motorcycle racing series. Data including the places and lap times of riders are freely available online, provided by [Trackside](https://www.tracksidesoftware.com/). However, there exists no published exploration or analysis on the series. This report aims to take these first steps and do some exploratory data analysis.
+The Triple Crown Series is Canada's premier off-road motorcycle racing series. Data including the places and lap times of riders are freely available online, provided by [Trackside](https://www.tracksidesoftware.com/). However, there exists no published analysis on the series. This report aims to take these first steps and do some exploratory data analysis.
 
 # 2 Background information
 
@@ -58,24 +58,21 @@ Here is a function that converts the lap times (string format) to seconds (numer
 
 ```{r}
 convert_to_seconds <- function(time_string) {
-  # Check if the input is a valid string and not empty
   if (is.na(time_string) | time_string == "") {
     return(NA)
   }
   
-  # If the time_string has a colon
   if (grepl(":", time_string)) {
-    # Extract minutes and seconds
-    mins <- as.numeric(substr(time_string, 1, regexpr(":", time_string) - 1))
-    secs <- as.numeric(substr(time_string, regexpr(":", time_string) + 1,
+    mins <- as.numeric(substr(time_string, 1, 
+                              regexpr(":", time_string) - 1))
+    secs <- as.numeric(substr(time_string, 
+                              regexpr(":", time_string) + 1,
                               nchar(time_string)))
     
     return(mins * 60 + secs)
   } 
   
-  # If the time_string does not have a colon
   else {
-    # Direct conversion for seconds
     numeric_val <- as.numeric(time_string)
     
     return(numeric_val)
@@ -315,8 +312,7 @@ rd31_2024_wmx <- mx_scraping("https://cmrc.tracksideresults.com/laptimes.asp?s=&
 
 rd32_2024_wmx <- mx_scraping("https://cmrc.tracksideresults.com/laptimes.asp?s=&c=54&e=14767&rn=2&rt=M", 2024, 3, 2, "Prairie Hill MX", "06/16/2024", "wmx_2024_6", "WMX", "mx")
 
-# Note that there are no WMX lap times for at Gopher Dunes
-# so only scraping the results
+# Note that there are no WMX lap times for at Gopher Dunes so only scraping the results
 
 url <- "https://cmrc.tracksideresults.com/class.asp?s=&c=58&e=14774"
 webpage <- read_html(url)
@@ -417,52 +413,29 @@ write.csv(all_2024_complete,"all_2024_complete.csv")
 
 Distributions of home locations:
 
-450 class:
-
 ```{r}
 all_2024_complete |>
-  filter(class == "450") |>
-  distinct(rider, location) |>
-  group_by(location) |>
-  summarize(n = n()) |>
+  distinct(class, rider, location) |>
+  group_by(class, location) |>
+  summarize(n = n(),
+            .groups = "drop") |>
   ungroup() |>
   arrange(desc(n)) |>
+  pivot_wider(names_from = class,
+              values_from = n) |>
+  filter(! location == "unknown") |>
+  mutate(`250` = if_else(is.na(`250`), 0, `250`),
+         WMX = if_else(is.na(WMX), 0, WMX),
+         `450` = if_else(is.na(`450`), 0, `450`)) |>
+  select(location, `450`, `250`, WMX) |>
   gt() |>
   cols_label(location = "Location",
-             n = "Number of Riders")
+             `450` = "450",
+             `250` = "250",
+             WMX = "WMX")
 ```
 
-250 class:
-
-```{r}
-all_2024_complete |>
-  filter(class == "250") |>
-  distinct(rider, location) |>
-  group_by(location) |>
-  summarize(n = n()) |>
-  ungroup() |>
-  arrange(desc(n)) |>
-  gt() |>
-  cols_label(location = "Location",
-             n = "Number of Riders")
-```
-
-WMX class:
-
-```{r}
-all_2024_complete |>
-  filter(class == "WMX") |>
-  distinct(rider, location) |>
-  group_by(location) |>
-  summarize(n = n()) |>
-  ungroup() |>
-  arrange(desc(n)) |>
-  gt() |>
-  cols_label(location = "Location",
-             n = "Number of Riders")
-```
-
-## 4.2 Transition matrices
+## 4.2 Passing probabilities
 
 **Q1**: What is the likelihood to go from one position to any other position on any given lap?
 
@@ -524,8 +497,9 @@ rownames(matrix450_1) <- cats
 colnames(matrix450_1) <- cats
 print(round(matrix450_1, 2))
 ```
+We can see that there is a 96% chance of staying in first and a 3% chance of falling from first to second on any given lap.
 
-2.  Grouped place positions - The 30 x 30 matrix can be overwhelming. So, let's group the place positions and apply the same method. Here are the group we will use: 1-5, 6-10, 11-15, 16-20, 21-25, 26-30. This will require some reformatting of the empirical data.
+2.  Grouped place positions - The 30 x 30 matrix can be overwhelming. So, let's group the place positions and apply the same method. Here are the group we will use: 1-5, 6-10, 11-15, 16-20, 21-25, 26-30.
 
 ```{r}
 #| warning: false
@@ -546,14 +520,10 @@ all_2024_450_placecat <- all_2024_complete |>
                      ifelse(place >= 21 & place <= 25, 
                             "21-25","26-30"))))),
          place_next_cat = ifelse(place_next >= 1 & place_next <= 5, "1-5",
-                          ifelse(place_next >= 6 & place_next <= 10,
-                                 "6-10",
-                          ifelse(place_next >= 11 & place_next <= 15, 
-                                 "11-15",
-                          ifelse(place_next >= 16 & place_next <= 20, 
-                                 "16-20",
-                          ifelse(place_next >= 21 & place_next <= 25, 
-                                 "21-25", "26-30")))))) |>
+                          ifelse(place_next >= 6 & place_next <= 10, "6-10",
+                          ifelse(place_next >= 11 & place_next <= 15, "11-15",
+                          ifelse(place_next >= 16 & place_next <= 20, "16-20",
+                          ifelse(place_next >= 21 & place_next <= 25, "21-25", "26-30")))))) |>
   select(place_cat, place_next_cat) |>
   group_by(place_cat, place_next_cat) |>
   summarise(n = n()) |>
@@ -589,7 +559,16 @@ for (i in 1:rows2) {
 
 rownames(matrix450_2) <- cats2
 colnames(matrix450_2) <- cats2
-print(round(matrix450_2, 3))
+
+tm_450 <- as.data.frame(as.table(matrix450_2))
+ggplot(tm_450, aes(Var1, Var2, fill = Freq)) +
+  geom_tile() +
+  scale_fill_gradient(low = "white", high = "#da3a32") +
+  geom_text(aes(label = round(Freq,2))) +
+  labs(title = "Passing Probabilities",
+       subtitle = "2024 Season - 450 Class",
+       x = "From Place", 
+       y = "To Place", fill = "Probability")
 ```
 
 Let's apply the same analysis to the 250 class. The only difference will be that 250 motos can include a maximum of 40 riders so the groups will be 1-5, 6-10, 11-15, 16-20, 21-25, 26-30, 31-35, 36-40.
@@ -664,18 +643,12 @@ all_2024_250_placecat <- all_2024_complete |>
                      ifelse(place >= 31 & place <= 35,
                             "31-35", "36-40"))))))),
          place_next_cat = ifelse(place_next >= 1 & place_next <= 5, "1-5",
-                          ifelse(place_next >= 6 & place_next <= 10,
-                                 "6-10",
-                          ifelse(place_next >= 11 & place_next <= 15, 
-                                 "11-15",
-                          ifelse(place_next >= 16 & place_next <= 20, 
-                                 "16-20",
-                          ifelse(place_next >= 21 & place_next <= 25, 
-                                 "21-25", 
-                          ifelse(place_next >= 26 & place_next <= 30, 
-                                 "26-30",
-                          ifelse(place_next >= 31 & place_next <= 35,
-                                 "31-35", "36-40")))))))) |>
+                          ifelse(place_next >= 6 & place_next <= 10, "6-10",
+                          ifelse(place_next >= 11 & place_next <= 15, "11-15",
+                          ifelse(place_next >= 16 & place_next <= 20, "16-20",
+                          ifelse(place_next >= 21 & place_next <= 25, "21-25", 
+                          ifelse(place_next >= 26 & place_next <= 30, "26-30",
+                          ifelse(place_next >= 31 & place_next <= 35, "31-35", "36-40")))))))) |>
   select(place_cat, place_next_cat) |>
   group_by(place_cat, place_next_cat) |>
   summarise(n = n()) |>
@@ -712,7 +685,16 @@ for (i in 1:rows2) {
 
 rownames(matrix250_2) <- cats2
 colnames(matrix250_2) <- cats2
-print(round(matrix250_2, 3))
+
+tm_250 <- as.data.frame(as.table(matrix250_2))
+ggplot(tm_250, aes(Var1, Var2, fill = Freq)) +
+  geom_tile() +
+  scale_fill_gradient(low = "white", high = "#da3a32") +
+  geom_text(aes(label = round(Freq,2))) +
+  labs(title = "Passing Probabilities",
+       subtitle = "2024 Season - 250 Class",
+       x = "From Place", 
+       y = "To Place", fill = "Probability")
 ```
 
 Lastly, let's apply the same analysis to the WMX class.
@@ -787,14 +769,10 @@ all_2024_wmx_placecat <- all_2024_complete |>
                      ifelse(place >= 21 & place <= 25, 
                             "21-25","26-30"))))),
          place_next_cat = ifelse(place_next >= 1 & place_next <= 5, "1-5",
-                          ifelse(place_next >= 6 & place_next <= 10,
-                                 "6-10",
-                          ifelse(place_next >= 11 & place_next <= 15, 
-                                 "11-15",
-                          ifelse(place_next >= 16 & place_next <= 20, 
-                                 "16-20",
-                          ifelse(place_next >= 21 & place_next <= 25, 
-                                 "21-25", "26-30")))))) |>
+                          ifelse(place_next >= 6 & place_next <= 10, "6-10",
+                          ifelse(place_next >= 11 & place_next <= 15, "11-15",
+                          ifelse(place_next >= 16 & place_next <= 20, "16-20",
+                          ifelse(place_next >= 21 & place_next <= 25, "21-25", "26-30")))))) |>
   select(place_cat, place_next_cat) |>
   group_by(place_cat, place_next_cat) |>
   summarise(n = n()) |>
@@ -830,49 +808,205 @@ for (i in 1:rows2) {
 
 rownames(matrixwmx_2) <- cats2
 colnames(matrixwmx_2) <- cats2
-print(round(matrixwmx_2, 3))
-```
 
-So, what is the probability of going from 6-10 to 1-5 on any given lap for each class?
-
-450: `r round(matrix450_2[2,1], 3)`
-
-250: `r round(matrix250_2[2,1], 3)`
-
-WMX: `r round(matrixwmx_2[2,1], 3)`
-
-It appears that is easiest to move into the top 5 in the 250 class with a probability of 4.3%. It is hardest in the WMX class, where there is a 2.8% chance.
-
-Here is a visual way to represent these transition matrices:
-
-```{r}
-tm_450 <- as.data.frame(as.table(matrix450_2))
-ggplot(tm_450, aes(Var1, Var2, fill = Freq)) +
-  geom_tile() +
-  scale_fill_gradient(low = "white", high = "#da3a32") +
-  geom_text(aes(label = round(Freq,2))) +
-  labs(title = "State Probabilities - 450 Heatmap", x = "From ", 
-       y = "To", fill = "Probability")
-```
-
-```{r}
-tm_250 <- as.data.frame(as.table(matrix250_2))
-ggplot(tm_250, aes(Var1, Var2, fill = Freq)) +
-  geom_tile() +
-  scale_fill_gradient(low = "white", high = "#da3a32") +
-  geom_text(aes(label = round(Freq,2))) +
-  labs(title = "State Probabilities - 250 Heatmap", x = "From ", 
-       y = "To", fill = "Probability")
-```
-
-```{r}
 tm_wmx <- as.data.frame(as.table(matrixwmx_2))
 ggplot(tm_wmx, aes(Var1, Var2, fill = Freq)) +
   geom_tile() +
   scale_fill_gradient(low = "white", high = "#da3a32") +
   geom_text(aes(label = round(Freq,2))) +
-  labs(title = "State Probabilities - WMX Heatmap", x = "From ", 
-       y = "To", fill = "Probability")
+  labs(title = "Passing Probabilities",
+       subtitle = "2024 Season - WMX Class",
+       x = "From Place", 
+       y = "To Place", fill = "Probability")
+```
+The same analysis can be done at an individual moto or individual rider level.
+
+```{r}
+#| warning: false
+pass_prob_moto_fn <- function(input_class, input_raceid) {
+  placecat <- all_2024_complete |>
+    filter(class == input_class & race_id == input_raceid) |>
+    mutate(race_id_name = paste(race_id, rider, sep = "_")) |>
+    mutate(place_next = lead(place, n = 1L,
+                             order_by = race_id_name)) |>
+    group_by(race_id_name) |>
+    mutate(place_next = c(place_next[-n()], NA)) |>
+    ungroup() |>
+    drop_na(place, place_next) |>
+    select(place, place_next) |>
+    mutate(place_cat = ifelse(place >= 1 & place <= 5, "1-5",
+                              ifelse(place >= 6 & place <= 10, "6-10",
+                                     ifelse(place >= 11 & place <= 15, "11-15",
+                                            ifelse(place >= 16 & place <= 20, "16-20",
+                                                   ifelse(place >= 21 & place <= 25, "21-25",
+                                                          ifelse(place >= 26 & place <= 30, "26-30",
+                                                                 ifelse(place >= 31 & place <= 35,
+                                                                        "31-35", "36-40"))))))),
+           place_next_cat = ifelse(place_next >= 1 & place_next <= 5, "1-5",
+                                   ifelse(place_next >= 6 & place_next <= 10, "6-10",
+                                          ifelse(place_next >= 11 & place_next <= 15, "11-15",
+                                                 ifelse(place_next >= 16 & place_next <= 20, "16-20",
+                                                        ifelse(place_next >= 21 & place_next <= 25, "21-25", 
+                                                               ifelse(place_next >= 26 & place_next <= 30, "26-30",
+                                                                      ifelse(place_next >= 31 & place_next <= 35, "31-35", "36-40")))))))) |>
+    select(place_cat, place_next_cat) |>
+    group_by(place_cat, place_next_cat) |>
+    summarise(n = n()) |>
+    ungroup()
+  
+  placecat2 <- placecat |>
+    group_by(place_cat) |>
+    summarise(total = sum(n)) |>
+    ungroup()
+  
+  placecat <- placecat |>
+    left_join(placecat2) |>
+    mutate(prob = n/total)
+  
+  distinct_cat <- placecat %>%
+    summarise(distinct_cats = n_distinct(place_cat)) |>
+    pull(distinct_cats)
+  
+    rows = distinct_cat
+    cols = distinct_cat
+    if (distinct_cat == 4) {
+      cats <- c("1-5", "6-10", "11-15", "16-20")
+    } else if (distinct_cat == 5) {
+      cats <- c("1-5", "6-10", "11-15", "16-20", "21-25")
+    } else if (distinct_cat == 6) {
+      cats <- c("1-5", "6-10", "11-15", "16-20", "21-25", "26-30")
+    } else if (distinct_cat == 7) {
+      cats <- c("1-5", "6-10", "11-15", "16-20", "21-25", "26-30",
+                "31-35")
+    } else if (distinct_cat == 8) {
+      cats <- c("1-5", "6-10", "11-15", "16-20", "21-25", "26-30",
+                "31-35", "36-40")
+    }
+    
+    pass_matrix <- matrix(0, nrow = rows, ncol = cols)
+    for (i in 1:rows) {
+      for (j in 1:cols) {
+        matrix_row <- placecat |>
+          filter(place_cat == cats[i] & place_next_cat == cats[j])
+        if (nrow(matrix_row) == 0) {
+          matrix_value <- 0
+        } else {
+          matrix_value <- placecat |> 
+            filter(place_cat == cats[i] & place_next_cat == cats[j]) |> pull(prob)
+        }
+        pass_matrix[i, j] <- matrix_value
+      }
+    }
+    
+    rownames(pass_matrix) <- cats
+    colnames(pass_matrix) <- cats
+
+  pass_matrix_df <- as.data.frame(as.table(pass_matrix))
+  ggplot(pass_matrix_df, aes(Var1, Var2, fill = Freq)) +
+    geom_tile() +
+    scale_fill_gradient(low = "white", high = "#da3a32") +
+    geom_text(aes(label = round(Freq,2))) +
+    labs(title = "Passing Probabilities",
+         subtitle = input_raceid,
+         x = "From Place", 
+         y = "To Place", fill = "Probability")
+}
+  
+
+pass_prob_moto_fn("450", "450_2024_1")
+```
+
+```{r}
+#| warning: false
+pass_prob_rider_fn <- function(input_rider) {
+  placecat <- all_2024_complete |>
+    filter(rider == input_rider) |>
+    mutate(race_id_name = paste(race_id, rider, sep = "_")) |>
+    mutate(place_next = lead(place, n = 1L,
+                             order_by = race_id_name)) |>
+    group_by(race_id_name) |>
+    mutate(place_next = c(place_next[-n()], NA)) |>
+    ungroup() |>
+    drop_na(place, place_next) |>
+    select(place, place_next) |>
+    mutate(place_cat = ifelse(place >= 1 & place <= 5, "1-5",
+                              ifelse(place >= 6 & place <= 10, "6-10",
+                                     ifelse(place >= 11 & place <= 15, "11-15",
+                                            ifelse(place >= 16 & place <= 20, "16-20",
+                                                   ifelse(place >= 21 & place <= 25, "21-25",
+                                                          ifelse(place >= 26 & place <= 30, "26-30",
+                                                                 ifelse(place >= 31 & place <= 35, "31-35", "36-40"))))))),
+           place_next_cat = ifelse(place_next >= 1 & place_next <= 5, "1-5",
+                                   ifelse(place_next >= 6 & place_next <= 10, "6-10",
+                                          ifelse(place_next >= 11 & place_next <= 15, "11-15",
+                                                 ifelse(place_next >= 16 & place_next <= 20, "16-20",
+                                                        ifelse(place_next >= 21 & place_next <= 25, "21-25", 
+                                                               ifelse(place_next >= 26 & place_next <= 30, "26-30",
+                                                                      ifelse(place_next >= 31 & place_next <= 35, "31-35", "36-40")))))))) |>
+    select(place_cat, place_next_cat) |>
+    group_by(place_cat, place_next_cat) |>
+    summarise(n = n()) |>
+    ungroup()
+  
+  placecat2 <- placecat |>
+    group_by(place_cat) |>
+    summarise(total = sum(n)) |>
+    ungroup()
+  
+  placecat <- placecat |>
+    left_join(placecat2) |>
+    mutate(prob = n/total)
+  
+  distinct_cat <- placecat %>%
+    summarise(distinct_cats = n_distinct(place_cat)) |>
+    pull(distinct_cats)
+  
+  rows = distinct_cat
+  cols = distinct_cat
+  if (distinct_cat == 4) {
+    cats <- c("1-5", "6-10", "11-15", "16-20")
+  } else if (distinct_cat == 5) {
+    cats <- c("1-5", "6-10", "11-15", "16-20", "21-25")
+  } else if (distinct_cat == 6) {
+    cats <- c("1-5", "6-10", "11-15", "16-20", "21-25", "26-30")
+  } else if (distinct_cat == 7) {
+    cats <- c("1-5", "6-10", "11-15", "16-20", "21-25", "26-30",
+              "31-35")
+  } else if (distinct_cat == 8) {
+    cats <- c("1-5", "6-10", "11-15", "16-20", "21-25", "26-30",
+              "31-35", "36-40")
+  }
+  
+  pass_matrix <- matrix(0, nrow = rows, ncol = cols)
+  for (i in 1:rows) {
+    for (j in 1:cols) {
+      matrix_row <- placecat |>
+        filter(place_cat == cats[i] & place_next_cat == cats[j])
+      if (nrow(matrix_row) == 0) {
+        matrix_value <- 0
+      } else {
+        matrix_value <- placecat |> 
+          filter(place_cat == cats[i] & place_next_cat == cats[j]) |> pull(prob)
+      }
+      pass_matrix[i, j] <- matrix_value
+    }
+  }
+  
+  rownames(pass_matrix) <- cats
+  colnames(pass_matrix) <- cats
+  
+  pass_matrix_df <- as.data.frame(as.table(pass_matrix))
+  ggplot(pass_matrix_df, aes(Var1, Var2, fill = Freq)) +
+    geom_tile() +
+    scale_fill_gradient(low = "white", high = "#da3a32") +
+    geom_text(aes(label = round(Freq,2))) +
+    labs(title = "Passing Probabilities",
+         subtitle = input_rider, 
+         x = "From Place", 
+         y = "To Place", fill = "Probability")
+}
+
+pass_prob_rider_fn("TANNER WARD")
 ```
 
 **Q2**: What is the probability of going from one place group to another over the course of x laps?
@@ -903,7 +1037,7 @@ WMX class:
 round(matrixwmx_2 %^% x, 2)
 ```
 
-**Q3**: Do these state change probabilities themselves change over the course of a moto?
+**Q3**: Do passing probabilities themselves change over the course of a moto?
 
 To narrow the focus of this problem, we will consider how the probability of staying in 1-5 position group changes throughout a moto.
 
@@ -928,18 +1062,12 @@ all_2024_placecat_laps <- all_2024_complete |>
                      ifelse(place >= 31 & place <= 35, "31-35",
                             "36-40"))))))),
          place_next_cat = ifelse(place_next >= 1 & place_next <= 5, "1-5",
-                          ifelse(place_next >= 6 & place_next <= 10,
-                                 "6-10",
-                          ifelse(place_next >= 11 & place_next <= 15, 
-                                 "11-15",
-                          ifelse(place_next >= 16 & place_next <= 20, 
-                                 "16-20",
-                          ifelse(place_next >= 21 & place_next <= 25, 
-                                 "21-25", 
-                          ifelse(place_next >= 26 & place_next <= 30,
-                                 "26-30",
-                          ifelse(place_next >= 31 & place_next <= 35,
-                                 "31-35", "36-40")))))))) |>
+                          ifelse(place_next >= 6 & place_next <= 10, "6-10",
+                          ifelse(place_next >= 11 & place_next <= 15, "11-15",
+                          ifelse(place_next >= 16 & place_next <= 20, "16-20",
+                          ifelse(place_next >= 21 & place_next <= 25, "21-25", 
+                          ifelse(place_next >= 26 & place_next <= 30, "26-30",
+                          ifelse(place_next >= 31 & place_next <= 35, "31-35", "36-40")))))))) |>
   select(place_cat, place_next_cat, lap, class) |>
   group_by(place_cat, place_next_cat, lap, class) |>
   summarise(n = n()) |>
@@ -962,9 +1090,9 @@ all_2024_placecat_laps3 |>
   labs(x = "Lap", y = "Probability of Retaining 1-5", color = "Class")
 ```
 
-The bold line is the line of best fit from local polynomial regression. A big takeaway from this visual is that it usually becomes less probable of changing positions the longer the race goes on. This makes sense as gaps begin to open up.
+The bold line is the line of best fit from local polynomial regression. A big takeaway from this visual is that it usually becomes less likely to change positions the longer the race goes on. This makes sense as gaps begin to open up.
 
-**Q4**: What is the probability of going from place X on the first lap to finishing the moto in place Y?
+**Q4**: What is the probability of starting in place X and finishing the moto in place Y?
 
 450 class:
 
@@ -1061,14 +1189,14 @@ for (i in 1:rows2) {
 
 rownames(matrix450_4) <- cats2
 colnames(matrix450_4) <- cats2
-print(round(matrix450_4, 3))
 
 sf_450 <- as.data.frame(as.table(matrix450_4))
 ggplot(sf_450, aes(Var1, Var2, fill = Freq)) +
   geom_tile() +
   scale_fill_gradient(low = "white", high = "#da3a32") +
   geom_text(aes(label = round(Freq,2))) +
-  labs(title = "450 Heatmap", x = "Start ", y = "Finish",
+  labs(title = "Start-Finish Probabilities",
+       subtitle = "450", x = "Start ", y = "Finish",
        fill = "Probability")
 ```
 
@@ -1172,14 +1300,14 @@ for (i in 1:rows2) {
 
 rownames(matrix250_4) <- cats2
 colnames(matrix250_4) <- cats2
-print(round(matrix250_4, 3))
 
 sf_250 <- as.data.frame(as.table(matrix250_4))
 ggplot(sf_250, aes(Var1, Var2, fill = Freq)) +
   geom_tile() +
   scale_fill_gradient(low = "white", high = "#da3a32") +
   geom_text(aes(label = round(Freq,2))) +
-  labs(title = "250 Heatmap", x = "Start ", y = "Finish",
+  labs(title = "Start-Finish Probabilities",
+       subtitle = "250", x = "Start ", y = "Finish",
        fill = "Probability")
 ```
 
@@ -1278,14 +1406,14 @@ for (i in 1:rows2) {
 
 rownames(matrixwmx_4) <- cats2
 colnames(matrixwmx_4) <- cats2
-print(round(matrixwmx_4, 3))
 
 sf_wmx <- as.data.frame(as.table(matrixwmx_4))
 ggplot(sf_wmx, aes(Var1, Var2, fill = Freq)) +
   geom_tile() +
   scale_fill_gradient(low = "white", high = "#da3a32") +
   geom_text(aes(label = round(Freq,2))) +
-  labs(title = "WMX Heatmap", x = "Start ", y = "Finish",
+  labs(title = "Start-Finish Probabilities",
+       subtitle = "WMX", x = "Start ", y = "Finish",
        fill = "Probability")
 ```
 
@@ -1301,7 +1429,6 @@ We also filter out lap times over 200 seconds as these are outliers and might af
 
 ```{r}
 #| warning: false
-
 all_2024_complete |>
   filter(class == "450" & lap > 1) |>
   ggplot(aes(x = lap, y = time, 
@@ -1309,18 +1436,8 @@ all_2024_complete |>
   geom_point(alpha = 0.2) +
   geom_smooth() +
   labs(x = "Lap", y = "Lap Time", color = "Race ID",
-       title = "450 - All Lap Times")
+       title = "All 450 Lap Times by Race")
 
-all_2024_complete |>
-  filter(class == "450" & time < 200 & lap > 1) |>
-  ggplot(aes(x = lap, y = time)) +
-  geom_point(alpha = 0.2) + 
-  facet_wrap(~paste0(round, "-", moto)) +
-  geom_smooth(method = "lm") +
-  labs(x = "Lap", y = "Lap Time",
-       title = "450 - Lap Times by Moto")
-
-# Applying the linear model
 all_2024_complete |>
   filter(class == "450" & time < 200 & lap > 1) |>
   group_by(paste0(round, "-", moto)) |>
@@ -1333,7 +1450,7 @@ all_2024_complete |>
              slope = "Slope")
 ```
 
-This shows that over the course of motos, lap times of riders are likely to increase in time. This is an indication of fatique as riders are slower. Note that the 450_2024_22 moto ended early due to Dylan Wright's fall so rider fatigue was yet to happen. 
+This shows that over the course of motos, lap times of riders are likely to increase. This is an indication of fatique. Note that the moto 2-2 ended early due to Dylan Wright's fall so rider fatigue was unlikely to kick in. 
 
 Here are the average lap times by lap for each moto:
 
@@ -1366,18 +1483,8 @@ all_2024_complete |>
   geom_point(alpha = 0.2) +
   geom_smooth() +
   labs(x = "Lap", y = "Lap Time", color = "Race ID",
-       title = "250 - All Lap Times")
+       title = "All 450 Lap Times by Race")
 
-all_2024_complete |>
-  filter(class == "250" & time < 250 & lap > 1) |>
-  ggplot(aes(x = lap, y = time)) +
-  geom_point(alpha = 0.2) + 
-  facet_wrap(~paste0(round, "-", moto)) +
-  geom_smooth(method = "lm") +
-  labs(x = "Lap", y = "Lap Time",
-       title = "250 - Lap Times by Moto")
-
-# Applying the linear model
 all_2024_complete |>
   filter(class == "250" & time < 250 & lap > 1) |>
   group_by(paste0(round, "-", moto)) |>
@@ -1390,7 +1497,7 @@ all_2024_complete |>
              slope = "Slope")
 ```
 
-This shows that for most motos, lap times of riders are likely to increase in time. This is an indication of fatigue as riders are getting slower.
+This shows that for most motos, lap times of riders are likely to increase in time. This is an indication of fatigue.
 
 Here are the average lap times by lap for each moto:
 
@@ -1423,18 +1530,8 @@ all_2024_complete |>
   geom_point(alpha = 0.2) +
   geom_smooth() +
   labs(x = "Lap", y = "Lap Time", color = "Race ID",
-       title = "WMX - All Lap Times")
+       title = "All 450 Lap Times by Race")
 
-all_2024_complete |>
-  filter(class == "WMX" & time < 250 & lap > 1) |>
-  ggplot(aes(x = lap, y = time)) +
-  geom_point(alpha = 0.2) + 
-  facet_wrap(~paste0(round, "-", moto)) +
-  geom_smooth(method = "lm") +
-  labs(x = "Lap", y = "Lap Time",
-       title = "WMX - Lap Times by Moto")
-
-# Applying the linear model
 all_2024_complete |>
   filter(class == "WMX" & time < 250 & lap > 1) |>
   group_by(paste0(round, "-", moto)) |>
@@ -1701,151 +1798,7 @@ points_race_250 |>
 
 The WMX class was not included in this analysis since there were technically three different series - West, East, and E/W Shootout.
 
-## 4.6 Rider profiles
-
-Top 10 of the 450 class:
-
-```{r}
-#| warning: false
-moto_id_450 <- tibble(race_id = c("450_2024_1", "450_2024_2",
-                              "450_2024_3", "450_2024_4",
-                              "450_2024_5", "450_2024_6",
-                              "450_2024_7", "450_2024_8",
-                              "450_2024_9", "450_2024_10",
-                              "450_2024_11", "450_2024_12",
-                              "450_2024_13", "450_2024_14",
-                              "450_2024_15", "450_2024_16"),
-                  moto_id = c("11","12","21","22","31","32","41","42",
-                              "51","52","61","62","71","72","81","82"))
-
-profile <- function(rider_name, num, mx_class, joiner) {
-  profile_1 <- all_2024_complete |>
-  filter(class == mx_class & lap == 1) |>
-  select(race_id, rider, place, finish) |>
-  filter(rider == rider_name) |>
-  full_join(joiner) |>
-  arrange(moto_id) |>
-  select(rider, moto_id, place, finish) |>
-  pivot_longer(cols = c("place", "finish"), 
-                          names_to = "category", 
-                          values_to = "value") |>
-  mutate(category = ifelse(category == "place", "Start", "Finish")) 
-
-profile_1$category <- factor(profile_1$category, 
-                                 levels = c("Start", "Finish"))
-
-profile_1 |>
-  ggplot(aes(x = factor(moto_id), y = value, fill = category)) +
-  geom_bar(stat = "identity", position = "dodge") +
-  geom_text(aes(label = value, color = category), 
-            position = position_dodge(width = 0.9), 
-            vjust = -0.5, size = 2.5, color = "black") +
-  labs(x = "Moto ID", y = "Position", fill = " ", 
-       title = paste0("#", num, " ", rider_name)) +
-  scale_fill_manual(values = c("Start" = "#32D2DA", 
-                               "Finish" = "#da3a32")) +
-  theme_minimal()
-}
-
-profile("JESS PETTIS", "15", "450", moto_id_450)
-profile("JOSIAH NATZKE", "23", "450", moto_id_450)
-profile("PRESTON KILROY", "808", "450", moto_id_450)
-profile("AARON TANTI", "109", "450", moto_id_450)
-profile("TANNER WARD", "84", "450", moto_id_450)
-profile("PARKER EALES", "18", "450", moto_id_450)
-profile("DYLAN WRIGHT", "1", "450", moto_id_450)
-profile("JULIEN BENEK", "17", "450", moto_id_450)
-profile("DANIEL ELMORE", "377", "450", moto_id_450)
-profile("MITCHELL HARRISON", "8", "450", moto_id_450)
-```
-
-Top 10 of the 250 class:
-
-```{r}
-#| warning: false
-moto_id_250 <- tibble(race_id = c("250_2024_1", "250_2024_2",
-                              "250_2024_3", "250_2024_4",
-                              "250_2024_5", "250_2024_6",
-                              "250_2024_7", "250_2024_8",
-                              "250_2024_9", "250_2024_10",
-                              "250_2024_11", "250_2024_12",
-                              "250_2024_13", "250_2024_14",
-                              "250_2024_15", "250_2024_16"),
-                  moto_id = c("11","12","21","22","31","32","41","42",
-                              "51","52","61","62","71","72","81","82"))
-
-profile("KAVEN BENOIT", "26", "250", moto_id_250)
-profile("DREW ADAMS", "300", "250", moto_id_250)
-profile("GAGE LINVILLE", "402", "250", moto_id_250)
-profile("SEBASTIEN RACINE", "12", "250", moto_id_250)
-profile("WYATT KERR", "59", "250", moto_id_250)
-profile("QUINN AMYOTTE", "14", "250", moto_id_250)
-profile("TYLER MEDAGLIA", "5", "250", moto_id_250)
-profile("TIGER WOOD", "143", "250", moto_id_250)
-profile("DYLAN REMPEL", "19", "250", moto_id_250)
-profile("EVAN STICE", "316", "250", moto_id_250)
-```
-
-Top 10 of the WMX class:
-
-```{r}
-#| warning: false
-moto_id_wmx <- tibble(race_id = c("wmx_2024_1", "wmx_2024_2",
-                              "wmx_2024_3", "wmx_2024_4",
-                              "wmx_2024_5", "wmx_2024_6",
-                              "wmx_2024_7", "wmx_2024_8",
-                              "wmx_2024_9", "wmx_2024_10",
-                              "wmx_2024_11", "wmx_2024_12",
-                              "wmx_2024_13", "wmx_2024_14",
-                              "wmx_2024_15", "wmx_2024_16"),
-                  moto_id = c("11","12","21","22","31","32","41","42",
-                              "51","52","61","62","71","72","81","82"))
-
-profile_wmx <- function(rider_name, num) {
-  profile_1 <- all_2024_complete |>
-    mutate(lap = ifelse(round == 4, 1, lap),
-           place = ifelse(round == 4, NA, place)) |>
-    filter(class == "WMX" & lap == 1) |>
-    select(race_id, rider, place, finish) |>
-    filter(rider == rider_name) |>
-    full_join(moto_id_wmx) |>
-    arrange(moto_id) |>
-    select(rider, moto_id, place, finish) |>
-    pivot_longer(cols = c("place", "finish"), 
-                          names_to = "category", 
-                          values_to = "value") |>
-    mutate(category = ifelse(category == "place", "Start", "Finish")) 
-
-  profile_1$category <- factor(profile_1$category, 
-                                 levels = c("Start", "Finish"))
-
-  profile_1 |>
-    ggplot(aes(x = factor(moto_id), y = value, fill = category)) +
-    geom_bar(stat = "identity", position = "dodge") +
-    geom_text(aes(label = value, color = category), 
-            position = position_dodge(width = 0.9), 
-            vjust = -0.5, size = 2.5, color = "black") +
-    labs(x = "Moto ID", y = "Position", fill = " ", 
-         title = paste0("#", num, " ", rider_name)) +
-    scale_fill_manual(values = c("Start" = "#32D2DA", 
-                               "Finish" = "#da3a32")) +
-    theme_minimal()
-}
-
-profile_wmx("EVE BRODEUR", "1")
-profile_wmx("KAYLIE KAYER", "3w")
-profile_wmx("KATRINE FERGUSON", "7W")
-profile_wmx("JAIME ASTUDILLO", "469")
-profile_wmx("BROOK GREENLAW", "6E")
-profile_wmx("VIVIANA CONTRERAS", "50")
-profile_wmx("AMELIE CROTEAU", "8")
-profile_wmx("BRITTANI MAJCHER", "14")
-profile_wmx("TEA FERGUSON", "9W")
-profile_wmx("ANI FERGUSON", "11")
-
-```
-
-## 4.7 Positions gained
+## 4.6 Positions gained
 
 ```{r}
 #| warning: false
@@ -1871,6 +1824,8 @@ all_2024_poschange <- all_2024_complete |>
   ungroup()
 ```
 
+450 class:
+
 ```{r}
 #| warning: false
 
@@ -1888,6 +1843,8 @@ all_2024_poschange |>
              passes_per_moto = "Passes/Moto")
 ```
 
+250 class:
+
 ```{r}
 #| warning: false
 
@@ -1904,6 +1861,8 @@ all_2024_poschange |>
              avg_finish = "Average Finish",
              passes_per_moto = "Passes/Moto")
 ```
+
+WMX class:
 
 ```{r}
 #| warning: false
@@ -1936,11 +1895,11 @@ ggplot(all_2024_poschange,
        color = "Class")
 ```
 
-Lots of good insight in this graph. First, we see a similar pattern for all three classes. The riders who finish near the front are not making many passes. They usually have good starts and stay in the front throughout the moto. The riders who finish near the rear are not making many passes. They usually have poor starts and stay in the back throughout the moto. The most passing occurs in the middle of pack. 
+There is lots of useful insight from this graph. First, we see a similar pattern for all three classes. The riders who finish near the front are not making many passes. They usually have good starts and stay in the front throughout the moto. The riders who finish near the rear are not making many passes. They usually have poor starts and stay in the back throughout the moto. The most passing occurs in the middle of pack. 
 
 Second, we see that the 250 class has the most passing and the WMX class has the least amount of passing. 
 
-## 4.8 Best starters
+## 4.7 Best starters
 
 Unfortunately we don't access to any holeshot data, so we define the start variable as the rider's place after the first lap. 
 
@@ -1956,6 +1915,8 @@ all_2024_startfinish <- all_2024_complete |>
             avg_finish = round(mean(finish), 2)) |>
   ungroup()
 ```
+
+450 class:
 
 ```{r}
 #| warning: false
@@ -1973,6 +1934,8 @@ all_2024_startfinish |>
              avg_finish = "Average Finish")
 ```
 
+250 class:
+
 ```{r}
 #| warning: false
 
@@ -1988,6 +1951,8 @@ all_2024_startfinish |>
              avg_start = "Average Start",
              avg_finish = "Average Finish")
 ```
+
+WMX class:
 
 ```{r}
 #| warning: false
@@ -2005,15 +1970,300 @@ all_2024_startfinish |>
              avg_finish = "Average Finish")
 ```
 
-We can see that those who start strong often finish strong. For the 250 and 450 class, the best starter was also the champion. 
+We can see that those who start strong often finish strong. For the 250 and 450 class, the best starter was also the series champion. 
 
 We can also see in which direction the rider usually heads after the start. If the average finish is higher than the average start, the rider usually drops back. If the average finish is lower than the average start, the rider usually climbs up. However, it is important to note that a rider who starts well usually has no place to go but down. This is why Jess Pettis has an average finish below his average start because he starts so many motos in the lead.
+
+## 4.8 Lap consistency
+
+By creating density histograms of lap times during a particular moto, we can assess which riders are consistently fast.
+
+Here are the top five finishers of the first moto for the 450 class:
+
+```{r}
+#| warning: false
+
+moto_consistency <- function(input_raceid) {
+  all_2024_complete |>
+    filter(race_id == input_raceid) |>
+    filter(lap != 1 & finish <= 5) |>
+    ggplot(aes(x = time, color = paste0(finish, "-", rider))) +
+    geom_density() +
+    labs(x = "Lap Time",
+         y = "Density",
+         color = "Rider",
+         title = "450 Class - Rd 1 - Moto 1")
+}
+moto_consistency("450_2024_1")
+```
+
+The central tendency of the race winner, Dylan Wright, is the further to the left, indicating that he had the fastest lap times. However, Wright has the flattest curve, indicating a lack of consistency in this moto. The curve of Josiah Natzke is the tallest, which shows that he had the most consistent lap times, even if they weren't the fastest in the field. 
+
+## 4.9 Lap comparisons to race leader
+
+It is useful to compare how a rider is performing in a moto relative to the race leader. We can see the points in a race where the rider begins to fall off.
+
+The following table highlights 450 rider Tanner Ward's lap times in the first moto of the season.
+
+```{r}
+#| warning: false
+
+lap_comparison <- function(input_raceid, input_rider) {
+  leader_times <- all_2024_complete |>
+    filter(race_id == input_raceid & place == 1) |>
+    select(lap, time) |>
+    rename(leader_time = time) |>
+    arrange(lap)
+  
+  all_2024_complete |>
+    filter(race_id == input_raceid & rider == input_rider) |>
+    select(lap, time) |>
+    left_join(leader_times) |>
+    mutate(last_lap_time = lag(time, default = NA)) |>
+    mutate(diff_lastlap = time - last_lap_time,
+           diff_leader = time - leader_time) |>
+    select(lap, time, diff_lastlap, diff_leader) |>
+    gt() |>
+    cols_label(lap = "Lap",
+             time = "Time",
+             diff_lastlap = "Difference to Last Lap",
+             diff_leader = "Difference to Leader Lap")
+}
+
+lap_comparison("450_2024_1", "TANNER WARD")
+```
+
+We can see that Ward had a slower start to this moto, putting in laps around 4-5 seconds behind the leader. But he comes on strong towards the end, even putting in some laps faster than the race leader Dylan Wright. 
+
+## 4.10 Win probability model
+
+If we know how many laps are left, what place a rider is positioned in, and how far they are behind the leader, we can predict the likelihood that they go on to win the race. 
+
+```{r}
+#| warning: false
+
+winning_model_data <- all_2024_complete |>
+  filter(! is.na(behind)) |>
+  mutate(won_race = if_else(finish == 1, 1, 0)) |>
+  group_by(race_id, rider) |>
+  mutate(laps_left = max(lap) - lap) |>
+  ungroup() |>
+  select(rider, race_id, laps_left, place, behind, won_race) |>
+  mutate(won_race = factor(won_race))
+
+logistic_model <- glm(won_race ~ laps_left + place + behind, 
+                      data = winning_model_data, 
+                      family = binomial)
+summary(logistic_model)
+
+exp(coef(logistic_model))
+```
+
+Because the p-value is less than 0.05, we can say that all included variables are statistically significant.
+
+Some interpretation:
+-   For each additional lap left, the odds of winning decrease by 7%. Riders are more likely to win when there are fewer laps left.
+-   For each increase in place number, the odds of winning decrease by 30.1%. Being in a higher place number lowers the chance of winning the moto.
+-   For each additional second behind the leader, the odds of winning decrease by 27.4%. Being further behind the leader reduces the chances of winning. 
+
+Now, we can add win probability predictions to the data and see which riders average the highest win probability.
+
+```{r}
+#| warning: false
+
+winning_model_data$win_prob <- round(predict(logistic_model, 
+                                       type = "response"), 2)
+
+winning_model_data |>
+  group_by(rider, race_id) |>
+  summarize(avg_win_prob = mean(win_prob)) |>
+  ungroup() |>
+  group_by(rider) |>
+  summarize(avg_win_prob = round(mean(avg_win_prob),2)) |>
+  slice_max(avg_win_prob, n = 15) |>
+  gt() |>
+  cols_label(rider = "Rider",
+             avg_win_prob = "Average Win Probability")
+```
+
+Here are the cases where the rider has the largest range in win probability.
+
+```{r}
+winning_model_data |>
+  group_by(rider, race_id) |>
+  mutate(low_prob = min(win_prob),
+         high_prob = max(win_prob),
+         prob_diff = high_prob - low_prob) |>
+  ungroup() |>
+  distinct(rider, race_id, low_prob, high_prob, prob_diff) |>
+  slice_max(prob_diff, n = 15) |>
+  gt() |>
+  cols_label(rider = "Rider",
+             race_id = "Race ID",
+             low_prob = "Lowest Win Prob",
+             high_prob = "Highest Win Prob",
+             prob_diff = "Win Prob Difference")
+```
+
+
+
+## 4.11 Rider profiles
+
+450 class:
+
+```{r}
+#| warning: false
+moto_id_450 <- tibble(race_id = c("450_2024_1", "450_2024_2",
+                                  "450_2024_3", "450_2024_4",
+                                  "450_2024_5", "450_2024_6",
+                                  "450_2024_7", "450_2024_8",
+                                  "450_2024_9", "450_2024_10",
+                                  "450_2024_11", "450_2024_12",
+                                  "450_2024_13", "450_2024_14",
+                                  "450_2024_15", "450_2024_16"),
+                      moto_id = c("11","12","21","22","31","32","41","42",
+                                  "51","52","61","62","71","72","81","82"))
+
+profile <- function(rider_name, num, mx_class, joiner) {
+  profile_1 <- all_2024_complete |>
+    filter(class == mx_class & lap == 1) |>
+    select(race_id, rider, location, place, finish, points) |>
+    filter(rider == rider_name) |>
+    full_join(joiner) |>
+    arrange(moto_id) |>
+    select(rider, location, moto_id, place, finish, points) |>
+    pivot_longer(cols = c("place", "finish"), 
+                 names_to = "category", 
+                 values_to = "value") |>
+    mutate(category = ifelse(category == "place", "Start",
+                             "Finish"))
+  
+  profile_1$category <- factor(profile_1$category, 
+                               levels = c("Start", "Finish"))
+  
+  riders_class <- all_2024_complete |>
+    filter(class == mx_class) |>
+    distinct(rider) |>
+    cross_join(joiner)
+  
+  profile_2 <- all_2024_complete |>
+    filter(class == mx_class & lap == 1) |>
+    select(race_id, rider, place, finish, points) |>
+    full_join(riders_class) |>
+    group_by(rider) |>
+    mutate(total_points = cumsum(points)) |>
+    ungroup() |>
+    group_by(race_id) |>
+    mutate(points_rank = rank(desc(total_points), 
+                              ties.method = "first")) |>
+    filter(rider == rider_name) |>
+    arrange(moto_id) |>
+    select(rider, moto_id, points_rank)
+  
+  local <- profile_1 |>
+    distinct(location) |>
+    pull(1)
+  
+  gaps_1 <- all_2024_complete |>
+    filter(class == mx_class) |>
+    drop_na(place) |>
+    select(lap, time, behind, place, race_id, rider) |>
+    group_by(race_id, rider) |>
+    mutate(total_time = cumsum(time)) |>
+    ungroup() |>
+    mutate(next_place = place + 1)
+  
+  gaps_2 <- gaps_1 |>
+    left_join(gaps_1, by = join_by(next_place == place, 
+                                   race_id == race_id,
+                                   lap == lap)) |>
+    select(lap, race_id, rider.x, total_time.x, place, 
+           rider.y, total_time.y, next_place) |>
+    mutate(diff = total_time.x - total_time.y) |>
+    drop_na(rider.y) |>
+    filter(diff >= -3)
+  
+  rival_pairs <- gaps_2 |> 
+    select(rider.x, rider.y) |>
+    mutate(pair = map2_chr(rider.x, rider.y, 
+                           ~paste(sort(c(.x, .y)), collapse = "-"))) |>
+    count(pair) |>
+    separate(pair, into = c("rider1", "rider2"), sep = "-") |>
+    arrange(desc(n)) |>
+    filter(rider1 == rider_name | rider2 == rider_name) |>
+    mutate(rival = if_else(rider1 == rider_name,
+                           rider2, rider1)) |>
+    distinct(rival) |>
+    pull(rival)
+  
+  ggplot() +
+    geom_bar(data = profile_1, 
+             aes(x = factor(moto_id), y = value, fill = category),
+             stat = "identity", position = "dodge") +
+    geom_line(data = profile_2, 
+              aes(x = factor(moto_id), y = points_rank, 
+                  group = 1, color = "Standings"), 
+              size = 0.8) +
+    geom_text(data = profile_1,
+              aes(x = factor(moto_id), y = 0, fill = category,
+                  label = value, color = category),
+              position = position_dodge(width = 0.9), 
+              vjust = -0.5, size = 2, color = "black") +
+    labs(x = "Moto ID", y = "Position", fill = " ", color = " ",
+         title = paste0("#", num, " ", rider_name),
+         subtitle = paste0("Class: ", mx_class, "      ",
+                           "Location: ", local)) +
+    scale_fill_manual(values = c("Start" = "#32D2DA", 
+                                 "Finish" = "#da3a32")) +
+    scale_color_manual(values = c("Standings" = "black")) +
+    scale_y_continuous(name = "Position", 
+                       breaks = seq(0, max(max(profile_1$value,
+                                               profile_2$points_rank, na.rm = TRUE)),
+                                    by = 1),
+                       sec.axis = sec_axis(trans = ~ ., 
+                                           name = " ", 
+                                           breaks = seq(0, max(max(profile_2$points_rank, profile_1$value, na.rm = TRUE)), by = 1))) +
+    theme_minimal() +
+    geom_label(aes(x = Inf, y = Inf, 
+                   label = paste0("Top Rivalries:\n1. ", rival_pairs[1], "\n2. ", rival_pairs[2], "\n3. ", rival_pairs[3])), 
+               fill = "white",
+               vjust = 1, hjust = 1, size = 2)
+  
+}
+
+profile("JESS PETTIS", "15", "450", moto_id_450)
+profile("TANNER WARD", "84", "450", moto_id_450)
+```
+
+250 class:
+
+``` {r}
+#| warning: false
+
+moto_id_250 <- tibble(race_id = c("250_2024_1", "250_2024_2",
+                                  "250_2024_3", "250_2024_4",
+                                  "250_2024_5", "250_2024_6",
+                                  "250_2024_7", "250_2024_8",
+                                  "250_2024_9", "250_2024_10",
+                                  "250_2024_11", "250_2024_12",
+                                  "250_2024_13", "250_2024_14",
+                                  "250_2024_15", "250_2024_16"),
+                      moto_id = c("11","12","21","22","31","32","41","42",
+                                  "51","52","61","62","71","72","81","82"))
+
+profile("DREW ADAMS", "300", "250", moto_id_250)
+profile("TYLER MEDAGLIA", "5", "250", moto_id_250)
+```
 
 # 5 Extensions
 
 There are so many opportunities for further analysis. Here are some ideas I have to expand this project in the future:
 
 -   Add previous years data to the analysis. According to the [results](https://triplecrownseries.ca/results/) tab of the Triple Crown Series website, there is data going back to 2018.
+
+-   Integrate weather and temperature data to explore correlations with rider performance, especially fatigue levels.
+
+-   More modelling such as passing and finish place prediction.
 
 # 6 Notes
 
