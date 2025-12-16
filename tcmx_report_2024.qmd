@@ -35,7 +35,6 @@ Importing rider information spreadsheet:
 
 ```{r}
 riders <- read.csv("rider_info.csv")
-
 glimpse(riders)
 ```
 
@@ -43,9 +42,7 @@ The individual moto results table does not display any information about points 
 
 ```{r}
 points <- tibble(finish = 1:40, 
-                 points = c(25,22,20,18,16,15,14,13,12,11,
-                            10,9,8,7,6,5,4,3,2,1,0,0,0,0,0,0,0,0,0,0,
-                            0,0,0,0,0,0,0,0,0,0))
+                 points = c(25,22,20,18,16,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0))
 
 points |>
   slice_head(n = 20) |>
@@ -54,7 +51,7 @@ points |>
              points = "Points")
 ```
 
-Here is a function that converts the lap times (string format) to seconds (numeric format). For example, a lap time of 1:13.21 gets converted to 73.021.
+Here is a function that converts the lap times (string format) to seconds (numeric format). For example, a lap time of 1:13.21 gets converted to 73.21.
 
 ```{r}
 convert_to_seconds <- function(time_string) {
@@ -204,41 +201,41 @@ mx_scraping <- function(url, year, round, moto, track,
 
 From here, we can apply this function for every moto of each class.
 
-450 class:
+<u><u>450 class</u></u>:
 
 ```{r}
 #| warning: false
-rd11_2024_450 <- mx_scraping("https://cmrc.tracksideresults.com/laptimes.asp?s=&c=33&e=14641&rn=1&rt=M", 2024, 1, 1, "Wild Rose MX", "06/02/2024", "450_2024_1", "450", "mx")
+rd11_2024_450 <- mx_scraping("https://resultsmx.com/cmrc-archive-2024/laptimes.asp?s=&c=33&e=14641&rn=1&rt=M", 2024, 1, 1, "Wild Rose MX", "06/02/2024", "450_2024_1", "450", "mx")
 
-rd12_2024_450 <- mx_scraping("https://cmrc.tracksideresults.com/laptimes.asp?s=&c=33&e=14641&rn=2&rt=M", 2024, 1, 2, "Wild Rose MX", "06/02/2024", "450_2024_2", "450", "mx")
+rd12_2024_450 <- mx_scraping("https://resultsmx.com/cmrc-archive-2024/laptimes.asp?s=&c=33&e=14641&rn=2&rt=M", 2024, 1, 2, "Wild Rose MX", "06/02/2024", "450_2024_2", "450", "mx")
 
-rd21_2024_450 <- mx_scraping("https://cmrc.tracksideresults.com/laptimes.asp?s=&c=33&e=14683&rn=1&rt=M", 2024, 2, 1, "Lethbridge MX", "06/09/2024", "450_2024_3", "450", "mx")
+rd21_2024_450 <- mx_scraping("https://resultsmx.com/cmrc-archive-2024/laptimes.asp?s=&c=33&e=14683&rn=1&rt=M", 2024, 2, 1, "Lethbridge MX", "06/09/2024", "450_2024_3", "450", "mx")
 
-rd22_2024_450 <- mx_scraping("https://cmrc.tracksideresults.com/laptimes.asp?s=&c=33&e=14683&rn=2&rt=M", 2024, 2, 2, "Lethbridge MX", "06/09/2024", "450_2024_4", "450", "mx")
+rd22_2024_450 <- mx_scraping("https://resultsmx.com/cmrc-archive-2024/laptimes.asp?s=&c=33&e=14683&rn=2&rt=M", 2024, 2, 2, "Lethbridge MX", "06/09/2024", "450_2024_4", "450", "mx")
 
-rd31_2024_450 <- mx_scraping("https://cmrc.tracksideresults.com/laptimes.asp?s=&c=33&e=14767&rn=1&rt=M", 2024, 3, 1, "Prairie Hill MX", "06/16/2024", "450_2024_5", "450", "mx")
+rd31_2024_450 <- mx_scraping("https://resultsmx.com/cmrc-archive-2024/laptimes.asp?s=&c=33&e=14767&rn=1&rt=M", 2024, 3, 1, "Prairie Hill MX", "06/16/2024", "450_2024_5", "450", "mx")
 
-rd32_2024_450 <- mx_scraping("https://cmrc.tracksideresults.com/laptimes.asp?s=&c=33&e=14767&rn=2&rt=M", 2024, 3, 2, "Prairie Hill MX", "06/16/2024", "450_2024_6", "450", "mx")
+rd32_2024_450 <- mx_scraping("https://resultsmx.com/cmrc-archive-2024/laptimes.asp?s=&c=33&e=14767&rn=2&rt=M", 2024, 3, 2, "Prairie Hill MX", "06/16/2024", "450_2024_6", "450", "mx")
 
-rd41_2024_450 <- mx_scraping("https://cmrc.tracksideresults.com/laptimes.asp?s=&c=33&e=14774&rn=1&rt=M", 2024, 4, 1, "Gopher Dunes", "07/07/2024", "450_2024_7", "450", "mx")
+rd41_2024_450 <- mx_scraping("https://resultsmx.com/cmrc-archive-2024/laptimes.asp?s=&c=33&e=14774&rn=1&rt=M", 2024, 4, 1, "Gopher Dunes", "07/07/2024", "450_2024_7", "450", "mx")
 
-rd42_2024_450 <- mx_scraping("https://cmrc.tracksideresults.com/laptimes.asp?s=&c=33&e=14774&rn=2&rt=M", 2024, 4, 2, "Gopher Dunes", "07/07/2024", "450_2024_8", "450", "mx")
+rd42_2024_450 <- mx_scraping("https://resultsmx.com/cmrc-archive-2024/laptimes.asp?s=&c=33&e=14774&rn=2&rt=M", 2024, 4, 2, "Gopher Dunes", "07/07/2024", "450_2024_8", "450", "mx")
 
-rd51_2024_450 <- mx_scraping("https://cmrc.tracksideresults.com/laptimes.asp?s=&c=33&e=14781&rn=1&rt=M", 2024, 5, 1, "Sand Del Lee MX101", "07/14/2024", "450_2024_9", "450", "mx")
+rd51_2024_450 <- mx_scraping("https://resultsmx.com/cmrc-archive-2024/laptimes.asp?s=&c=33&e=14781&rn=1&rt=M", 2024, 5, 1, "Sand Del Lee MX101", "07/14/2024", "450_2024_9", "450", "mx")
 
-rd52_2024_450 <- mx_scraping("https://cmrc.tracksideresults.com/laptimes.asp?s=&c=33&e=14781&rn=2&rt=M", 2024, 5, 2, "Sand Del Lee MX101", "07/14/2024", "450_2024_10", "450", "mx")
+rd52_2024_450 <- mx_scraping("https://resultsmx.com/cmrc-archive-2024/laptimes.asp?s=&c=33&e=14781&rn=2&rt=M", 2024, 5, 2, "Sand Del Lee MX101", "07/14/2024", "450_2024_10", "450", "mx")
 
-rd61_2024_450 <- mx_scraping("https://cmrc.tracksideresults.com/laptimes.asp?s=&c=33&e=14788&rn=1&rt=M", 2024, 6, 1, "Riverglade MX", "07/19/2024", "450_2024_11", "450", "mx")
+rd61_2024_450 <- mx_scraping("https://resultsmx.com/cmrc-archive-2024/laptimes.asp?s=&c=33&e=14788&rn=1&rt=M", 2024, 6, 1, "Riverglade MX", "07/19/2024", "450_2024_11", "450", "mx")
 
-rd62_2024_450 <- mx_scraping("https://cmrc.tracksideresults.com/laptimes.asp?s=&c=33&e=14788&rn=2&rt=M", 2024, 6, 2, "Riverglade MX", "07/19/2024", "450_2024_12", "450", "mx")
+rd62_2024_450 <- mx_scraping("https://resultsmx.com/cmrc-archive-2024/laptimes.asp?s=&c=33&e=14788&rn=2&rt=M", 2024, 6, 2, "Riverglade MX", "07/19/2024", "450_2024_12", "450", "mx")
 
-rd71_2024_450 <- mx_scraping("https://cmrc.tracksideresults.com/laptimes.asp?s=&c=33&e=14795&rn=1&rt=M", 2024, 7, 1, "MX Deschambault", "07/26/2024", "450_2024_13", "450", "mx")
+rd71_2024_450 <- mx_scraping("https://resultsmx.com/cmrc-archive-2024/laptimes.asp?s=&c=33&e=14795&rn=1&rt=M", 2024, 7, 1, "MX Deschambault", "07/26/2024", "450_2024_13", "450", "mx")
 
-rd72_2024_450 <- mx_scraping("https://cmrc.tracksideresults.com/laptimes.asp?s=&c=33&e=14795&rn=2&rt=M", 2024, 7, 2, "MX Deschambault", "07/26/2024", "450_2024_14", "450", "mx")
+rd72_2024_450 <- mx_scraping("https://resultsmx.com/cmrc-archive-2024/laptimes.asp?s=&c=33&e=14795&rn=2&rt=M", 2024, 7, 2, "MX Deschambault", "07/26/2024", "450_2024_14", "450", "mx")
 
-rd81_2024_450 <- mx_scraping("https://cmrc.tracksideresults.com/laptimes.asp?s=&c=33&e=14802&rn=1&rt=M", 2024, 8, 1, "Walton Raceway", "08/09/2024", "450_2024_15", "450", "mx")
+rd81_2024_450 <- mx_scraping("https://resultsmx.com/cmrc-archive-2024/laptimes.asp?s=&c=33&e=14802&rn=1&rt=M", 2024, 8, 1, "Walton Raceway", "08/09/2024", "450_2024_15", "450", "mx")
 
-rd82_2024_450 <- mx_scraping("https://cmrc.tracksideresults.com/laptimes.asp?s=&c=33&e=14802&rn=2&rt=M", 2024, 8, 2, "Walton Raceway", "08/09/2024", "450_2024_16", "450", "mx")
+rd82_2024_450 <- mx_scraping("https://resultsmx.com/cmrc-archive-2024/laptimes.asp?s=&c=33&e=14802&rn=2&rt=M", 2024, 8, 2, "Walton Raceway", "08/09/2024", "450_2024_16", "450", "mx")
 
 all_2024_450 <- bind_rows(rd11_2024_450, rd12_2024_450,
                           rd21_2024_450, rd22_2024_450,
@@ -250,41 +247,41 @@ all_2024_450 <- bind_rows(rd11_2024_450, rd12_2024_450,
                           rd81_2024_450, rd82_2024_450)
 ```
 
-250 class:
+<u>250 class</u>:
 
 ```{r}
 #| warning: false
-rd11_2024_250 <- mx_scraping("https://cmrc.tracksideresults.com/laptimes.asp?s=&c=32&e=14641&rn=1&rt=M", 2024, 1, 1, "Wild Rose MX", "06/02/2024", "250_2024_1", "250", "mx")
+rd11_2024_250 <- mx_scraping("https://resultsmx.com/cmrc-archive-2024/laptimes.asp?s=&c=32&e=14641&rn=1&rt=M", 2024, 1, 1, "Wild Rose MX", "06/02/2024", "250_2024_1", "250", "mx")
 
-rd12_2024_250 <- mx_scraping("https://cmrc.tracksideresults.com/laptimes.asp?s=&c=32&e=14641&rn=2&rt=M", 2024, 1, 2, "Wild Rose MX", "06/02/2024", "250_2024_2", "250", "mx")
+rd12_2024_250 <- mx_scraping("https://resultsmx.com/cmrc-archive-2024/laptimes.asp?s=&c=32&e=14641&rn=2&rt=M", 2024, 1, 2, "Wild Rose MX", "06/02/2024", "250_2024_2", "250", "mx")
 
-rd21_2024_250 <- mx_scraping("https://cmrc.tracksideresults.com/laptimes.asp?s=&c=32&e=14683&rn=1&rt=M", 2024, 2, 1, "Lethbridge MX", "06/09/2024", "250_2024_3", "250", "mx")
+rd21_2024_250 <- mx_scraping("https://resultsmx.com/cmrc-archive-2024/laptimes.asp?s=&c=32&e=14683&rn=1&rt=M", 2024, 2, 1, "Lethbridge MX", "06/09/2024", "250_2024_3", "250", "mx")
 
-rd22_2024_250 <- mx_scraping("https://cmrc.tracksideresults.com/laptimes.asp?s=&c=32&e=14683&rn=2&rt=M", 2024, 2, 2, "Lethbridge MX", "06/09/2024", "250_2024_4", "250", "mx")
+rd22_2024_250 <- mx_scraping("https://resultsmx.com/cmrc-archive-2024/laptimes.asp?s=&c=32&e=14683&rn=2&rt=M", 2024, 2, 2, "Lethbridge MX", "06/09/2024", "250_2024_4", "250", "mx")
 
-rd31_2024_250 <- mx_scraping("https://cmrc.tracksideresults.com/laptimes.asp?s=&c=32&e=14767&rn=1&rt=M", 2024, 3, 1, "Prairie Hill MX", "06/16/2024", "250_2024_5", "250", "mx")
+rd31_2024_250 <- mx_scraping("https://resultsmx.com/cmrc-archive-2024/laptimes.asp?s=&c=32&e=14767&rn=1&rt=M", 2024, 3, 1, "Prairie Hill MX", "06/16/2024", "250_2024_5", "250", "mx")
 
-rd32_2024_250 <- mx_scraping("https://cmrc.tracksideresults.com/laptimes.asp?s=&c=32&e=14767&rn=2&rt=M", 2024, 3, 2, "Prairie Hill MX", "06/16/2024", "250_2024_6", "250", "mx")
+rd32_2024_250 <- mx_scraping("https://resultsmx.com/cmrc-archive-2024/laptimes.asp?s=&c=32&e=14767&rn=2&rt=M", 2024, 3, 2, "Prairie Hill MX", "06/16/2024", "250_2024_6", "250", "mx")
 
-rd41_2024_250 <- mx_scraping("https://cmrc.tracksideresults.com/laptimes.asp?s=&c=32&e=14774&rn=1&rt=M", 2024, 4, 1, "Gopher Dunes", "07/07/2024", "250_2024_7", "250", "mx")
+rd41_2024_250 <- mx_scraping("https://resultsmx.com/cmrc-archive-2024/laptimes.asp?s=&c=32&e=14774&rn=1&rt=M", 2024, 4, 1, "Gopher Dunes", "07/07/2024", "250_2024_7", "250", "mx")
 
-rd42_2024_250 <- mx_scraping("https://cmrc.tracksideresults.com/laptimes.asp?s=&c=32&e=14774&rn=2&rt=M", 2024, 4, 2, "Gopher Dunes", "07/07/2024", "250_2024_8", "250", "mx")
+rd42_2024_250 <- mx_scraping("https://resultsmx.com/cmrc-archive-2024/laptimes.asp?s=&c=32&e=14774&rn=2&rt=M", 2024, 4, 2, "Gopher Dunes", "07/07/2024", "250_2024_8", "250", "mx")
 
-rd51_2024_250 <- mx_scraping("https://cmrc.tracksideresults.com/laptimes.asp?s=&c=32&e=14781&rn=1&rt=M", 2024, 5, 1, "Sand Del Lee MX101", "07/14/2024", "250_2024_9", "250", "mx")
+rd51_2024_250 <- mx_scraping("https://resultsmx.com/cmrc-archive-2024/laptimes.asp?s=&c=32&e=14781&rn=1&rt=M", 2024, 5, 1, "Sand Del Lee MX101", "07/14/2024", "250_2024_9", "250", "mx")
 
-rd52_2024_250 <- mx_scraping("https://cmrc.tracksideresults.com/laptimes.asp?s=&c=32&e=14781&rn=2&rt=M", 2024, 5, 2, "Sand Del Lee MX101", "07/14/2024", "250_2024_10", "250", "mx")
+rd52_2024_250 <- mx_scraping("https://resultsmx.com/cmrc-archive-2024/laptimes.asp?s=&c=32&e=14781&rn=2&rt=M", 2024, 5, 2, "Sand Del Lee MX101", "07/14/2024", "250_2024_10", "250", "mx")
 
-rd61_2024_250 <- mx_scraping("https://cmrc.tracksideresults.com/laptimes.asp?s=&c=32&e=14788&rn=1&rt=M", 2024, 6, 1, "Riverglade MX", "07/19/2024", "250_2024_11", "250", "mx")
+rd61_2024_250 <- mx_scraping("https://resultsmx.com/cmrc-archive-2024/laptimes.asp?s=&c=32&e=14788&rn=1&rt=M", 2024, 6, 1, "Riverglade MX", "07/19/2024", "250_2024_11", "250", "mx")
 
-rd62_2024_250 <- mx_scraping("https://cmrc.tracksideresults.com/laptimes.asp?s=&c=32&e=14788&rn=2&rt=M", 2024, 6, 2, "Riverglade MX", "07/19/2024", "250_2024_12", "250", "mx")
+rd62_2024_250 <- mx_scraping("https://resultsmx.com/cmrc-archive-2024/laptimes.asp?s=&c=32&e=14788&rn=2&rt=M", 2024, 6, 2, "Riverglade MX", "07/19/2024", "250_2024_12", "250", "mx")
 
-rd71_2024_250 <- mx_scraping("https://cmrc.tracksideresults.com/laptimes.asp?s=&c=32&e=14795&rn=1&rt=M", 2024, 7, 1, "MX Deschambault", "07/26/2024", "250_2024_13", "250", "mx")
+rd71_2024_250 <- mx_scraping("https://resultsmx.com/cmrc-archive-2024/laptimes.asp?s=&c=32&e=14795&rn=1&rt=M", 2024, 7, 1, "MX Deschambault", "07/26/2024", "250_2024_13", "250", "mx")
 
-rd72_2024_250 <- mx_scraping("https://cmrc.tracksideresults.com/laptimes.asp?s=&c=32&e=14795&rn=2&rt=M", 2024, 7, 2, "MX Deschambault", "07/26/2024", "250_2024_14", "250", "mx")
+rd72_2024_250 <- mx_scraping("https://resultsmx.com/cmrc-archive-2024/laptimes.asp?s=&c=32&e=14795&rn=2&rt=M", 2024, 7, 2, "MX Deschambault", "07/26/2024", "250_2024_14", "250", "mx")
 
-rd81_2024_250 <- mx_scraping("https://cmrc.tracksideresults.com/laptimes.asp?s=&c=32&e=14802&rn=1&rt=M", 2024, 8, 1, "Walton Raceway", "08/09/2024", "250_2024_15", "250", "mx")
+rd81_2024_250 <- mx_scraping("https://resultsmx.com/cmrc-archive-2024/laptimes.asp?s=&c=32&e=14802&rn=1&rt=M", 2024, 8, 1, "Walton Raceway", "08/09/2024", "250_2024_15", "250", "mx")
 
-rd82_2024_250 <- mx_scraping("https://cmrc.tracksideresults.com/laptimes.asp?s=&c=32&e=14802&rn=2&rt=M", 2024, 8, 2, "Walton Raceway", "08/09/2024", "250_2024_16", "250", "mx")
+rd82_2024_250 <- mx_scraping("https://resultsmx.com/cmrc-archive-2024/laptimes.asp?s=&c=32&e=14802&rn=2&rt=M", 2024, 8, 2, "Walton Raceway", "08/09/2024", "250_2024_16", "250", "mx")
 
 all_2024_250 <- bind_rows(rd11_2024_250, rd12_2024_250,
                           rd21_2024_250, rd22_2024_250,
@@ -296,25 +293,25 @@ all_2024_250 <- bind_rows(rd11_2024_250, rd12_2024_250,
                           rd81_2024_250, rd82_2024_250)
 ```
 
-WMX class:
+<u>WMX class</u>:
 
 ```{r}
 #| warning: false
-rd11_2024_wmx <- mx_scraping("https://cmrc.tracksideresults.com/laptimes.asp?s=&c=54&e=14641&rn=1&rt=M", 2024, 1, 1, "Wild Rose MX", "06/02/2024", "wmx_2024_1", "WMX", "mx")
+rd11_2024_wmx <- mx_scraping("https://resultsmx.com/cmrc-archive-2024/laptimes.asp?s=&c=54&e=14641&rn=1&rt=M", 2024, 1, 1, "Wild Rose MX", "06/02/2024", "wmx_2024_1", "WMX", "mx")
 
-rd12_2024_wmx <- mx_scraping("https://cmrc.tracksideresults.com/laptimes.asp?s=&c=54&e=14641&rn=2&rt=M", 2024, 1, 2, "Wild Rose MX", "06/02/2024", "wmx_2024_2", "WMX", "mx")
+rd12_2024_wmx <- mx_scraping("https://resultsmx.com/cmrc-archive-2024/laptimes.asp?s=&c=54&e=14641&rn=2&rt=M", 2024, 1, 2, "Wild Rose MX", "06/02/2024", "wmx_2024_2", "WMX", "mx")
 
-rd21_2024_wmx <- mx_scraping("https://cmrc.tracksideresults.com/laptimes.asp?s=&c=54&e=14683&rn=1&rt=M", 2024, 2, 1, "Lethbridge MX", "06/09/2024", "wmx_2024_3", "WMX", "mx")
+rd21_2024_wmx <- mx_scraping("https://resultsmx.com/cmrc-archive-2024/laptimes.asp?s=&c=54&e=14683&rn=1&rt=M", 2024, 2, 1, "Lethbridge MX", "06/09/2024", "wmx_2024_3", "WMX", "mx")
 
-rd22_2024_wmx <- mx_scraping("https://cmrc.tracksideresults.com/laptimes.asp?s=&c=54&e=14683&rn=2&rt=M", 2024, 2, 2, "Lethbridge MX", "06/09/2024", "wmx_2024_4", "WMX", "mx")
+rd22_2024_wmx <- mx_scraping("https://resultsmx.com/cmrc-archive-2024/laptimes.asp?s=&c=54&e=14683&rn=2&rt=M", 2024, 2, 2, "Lethbridge MX", "06/09/2024", "wmx_2024_4", "WMX", "mx")
 
-rd31_2024_wmx <- mx_scraping("https://cmrc.tracksideresults.com/laptimes.asp?s=&c=54&e=14767&rn=1&rt=M", 2024, 3, 1, "Prairie Hill MX", "06/16/2024", "wmx_2024_5", "WMX", "mx")
+rd31_2024_wmx <- mx_scraping("https://resultsmx.com/cmrc-archive-2024/laptimes.asp?s=&c=54&e=14767&rn=1&rt=M", 2024, 3, 1, "Prairie Hill MX", "06/16/2024", "wmx_2024_5", "WMX", "mx")
 
-rd32_2024_wmx <- mx_scraping("https://cmrc.tracksideresults.com/laptimes.asp?s=&c=54&e=14767&rn=2&rt=M", 2024, 3, 2, "Prairie Hill MX", "06/16/2024", "wmx_2024_6", "WMX", "mx")
+rd32_2024_wmx <- mx_scraping("https://resultsmx.com/cmrc-archive-2024/laptimes.asp?s=&c=54&e=14767&rn=2&rt=M", 2024, 3, 2, "Prairie Hill MX", "06/16/2024", "wmx_2024_6", "WMX", "mx")
 
 # Note that there are no WMX lap times for at Gopher Dunes so only scraping the results
 
-url <- "https://cmrc.tracksideresults.com/class.asp?s=&c=58&e=14774"
+url <- "https://resultsmx.com/cmrc-archive-2024/class.asp?c=58&e=14774"
 webpage <- read_html(url)
 lap_times_table <- webpage |>
   html_nodes("table") |>
@@ -325,11 +322,11 @@ lap_times <- lap_times_table[[8]]
 rd4_2024_wmx <- lap_times |>
   as_tibble() |>
   slice(2:n()) |>
-  select(-X1, -X3, -X7) |>
-  rename(number = X2,
-         rider = X4,
-         moto1_finish = X5,
-         moto2_finish = X6) |>
+  separate(X1, into = c("place", "number"), sep = "\r\n\t\t\t\r\n\t\t\t\t#") |>
+  select(-place, -X2, -X6) |>
+  rename(rider = X3,
+         moto1_finish = X4,
+         moto2_finish = X5) |>
   pivot_longer(
     cols = c(moto1_finish, moto2_finish), 
     names_to = "moto", 
@@ -355,21 +352,21 @@ rd4_2024_wmx <- lap_times |>
          year, round, moto, track, date, race_id, class, type, points) |>
   mutate(rider = str_trim(rider) |> str_squish())
 
-rd51_2024_wmx <- mx_scraping("https://cmrc.tracksideresults.com/laptimes.asp?s=&c=58&e=14781&rn=1&rt=M", 2024, 5, 1, "Sand Del Lee MX101", "07/14/2024", "wmx_2024_9", "WMX", "mx")
+rd51_2024_wmx <- mx_scraping("https://resultsmx.com/cmrc-archive-2024/laptimes.asp?s=&c=58&e=14781&rn=1&rt=M", 2024, 5, 1, "Sand Del Lee MX101", "07/14/2024", "wmx_2024_9", "WMX", "mx")
 
-rd52_2024_wmx <- mx_scraping("https://cmrc.tracksideresults.com/laptimes.asp?s=&c=58&e=14781&rn=2&rt=M", 2024, 5, 2, "Sand Del Lee MX101", "07/14/2024", "wmx_2024_10", "WMX", "mx")
+rd52_2024_wmx <- mx_scraping("https://resultsmx.com/cmrc-archive-2024/laptimes.asp?s=&c=58&e=14781&rn=2&rt=M", 2024, 5, 2, "Sand Del Lee MX101", "07/14/2024", "wmx_2024_10", "WMX", "mx")
 
-rd61_2024_wmx <- mx_scraping("https://cmrc.tracksideresults.com/laptimes.asp?s=&c=58&e=14788&rn=1&rt=M", 2024, 6, 1, "Riverglade MX", "07/19/2024", "wmx_2024_11", "WMX", "mx")
+rd61_2024_wmx <- mx_scraping("https://resultsmx.com/cmrc-archive-2024/laptimes.asp?s=&c=58&e=14788&rn=1&rt=M", 2024, 6, 1, "Riverglade MX", "07/19/2024", "wmx_2024_11", "WMX", "mx")
 
-rd62_2024_wmx <- mx_scraping("https://cmrc.tracksideresults.com/laptimes.asp?s=&c=58&e=14788&rn=2&rt=M", 2024, 6, 2, "Riverglade MX", "07/19/2024", "wmx_2024_12", "WMX", "mx")
+rd62_2024_wmx <- mx_scraping("https://resultsmx.com/cmrc-archive-2024/laptimes.asp?s=&c=58&e=14788&rn=2&rt=M", 2024, 6, 2, "Riverglade MX", "07/19/2024", "wmx_2024_12", "WMX", "mx")
 
-rd71_2024_wmx <- mx_scraping("https://cmrc.tracksideresults.com/laptimes.asp?s=&c=58&e=14795&rn=1&rt=M", 2024, 7, 1, "MX Deschambault", "07/26/2024", "wmx_2024_13", "WMX", "mx")
+rd71_2024_wmx <- mx_scraping("https://resultsmx.com/cmrc-archive-2024/laptimes.asp?s=&c=58&e=14795&rn=1&rt=M", 2024, 7, 1, "MX Deschambault", "07/26/2024", "wmx_2024_13", "WMX", "mx")
 
-rd72_2024_wmx <- mx_scraping("https://cmrc.tracksideresults.com/laptimes.asp?s=&c=58&e=14795&rn=2&rt=M", 2024, 7, 2, "MX Deschambault", "07/26/2024", "wmx_2024_14", "WMX", "mx")
+rd72_2024_wmx <- mx_scraping("https://resultsmx.com/cmrc-archive-2024/laptimes.asp?s=&c=58&e=14795&rn=2&rt=M", 2024, 7, 2, "MX Deschambault", "07/26/2024", "wmx_2024_14", "WMX", "mx")
 
-rd81_2024_wmx <- mx_scraping("https://cmrc.tracksideresults.com/laptimes.asp?s=&c=83&e=14802&rn=1&rt=M", 2024, 8, 1, "Walton Raceway", "08/09/2024", "wmx_2024_15", "WMX", "mx")
+rd81_2024_wmx <- mx_scraping("https://resultsmx.com/cmrc-archive-2024/laptimes.asp?s=&c=83&e=14802&rn=1&rt=M", 2024, 8, 1, "Walton Raceway", "08/09/2024", "wmx_2024_15", "WMX", "mx")
 
-rd82_2024_wmx <- mx_scraping("https://cmrc.tracksideresults.com/laptimes.asp?s=&c=83&e=14802&rn=2&rt=M", 2024, 8, 2, "Walton Raceway", "08/09/2024", "wmx_2024_16", "WMX", "mx")
+rd82_2024_wmx <- mx_scraping("https://resultsmx.com/cmrc-archive-2024/laptimes.asp?s=&c=83&e=14802&rn=2&rt=M", 2024, 8, 2, "Walton Raceway", "08/09/2024", "wmx_2024_16", "WMX", "mx")
 
 all_2024_wmx <- bind_rows(rd11_2024_wmx, rd12_2024_wmx,
                           rd21_2024_wmx, rd22_2024_wmx,
@@ -437,7 +434,7 @@ all_2024_complete |>
 
 ## 4.2 Passing probabilities
 
-**Q1**: What is the likelihood to go from one position to any other position on any given lap?
+**Q1**: What is the likelihood to go from one place to any other place on any given lap?
 
 Let's start with the 450 class.
 
@@ -497,6 +494,7 @@ rownames(matrix450_1) <- cats
 colnames(matrix450_1) <- cats
 print(round(matrix450_1, 2))
 ```
+
 We can see that there is a 96% chance of staying in first and a 3% chance of falling from first to second on any given lap.
 
 2.  Grouped place positions - The 30 x 30 matrix can be overwhelming. So, let's group the place positions and apply the same method. Here are the group we will use: 1-5, 6-10, 11-15, 16-20, 21-25, 26-30.
@@ -566,7 +564,7 @@ ggplot(tm_450, aes(Var1, Var2, fill = Freq)) +
   scale_fill_gradient(low = "white", high = "#da3a32") +
   geom_text(aes(label = round(Freq,2))) +
   labs(title = "Passing Probabilities",
-       subtitle = "2024 Season - 450 Class",
+       subtitle = "2024 Season - 450 class",
        x = "From Place", 
        y = "To Place", fill = "Probability")
 ```
@@ -692,7 +690,7 @@ ggplot(tm_250, aes(Var1, Var2, fill = Freq)) +
   scale_fill_gradient(low = "white", high = "#da3a32") +
   geom_text(aes(label = round(Freq,2))) +
   labs(title = "Passing Probabilities",
-       subtitle = "2024 Season - 250 Class",
+       subtitle = "2024 Season - 250 class",
        x = "From Place", 
        y = "To Place", fill = "Probability")
 ```
@@ -815,11 +813,12 @@ ggplot(tm_wmx, aes(Var1, Var2, fill = Freq)) +
   scale_fill_gradient(low = "white", high = "#da3a32") +
   geom_text(aes(label = round(Freq,2))) +
   labs(title = "Passing Probabilities",
-       subtitle = "2024 Season - WMX Class",
+       subtitle = "2024 Season - WMX class",
        x = "From Place", 
        y = "To Place", fill = "Probability")
 ```
-The same analysis can be done at an individual moto or individual rider level.
+
+The same analysis can be done at an individual moto or individual rider level. Here are the passing probabilities for the first 450 moto of 2024.
 
 ```{r}
 #| warning: false
@@ -915,6 +914,8 @@ pass_prob_moto_fn <- function(input_class, input_raceid) {
 
 pass_prob_moto_fn("450", "450_2024_1")
 ```
+
+Here are 450 rider Tanner Ward's passing probabilities across the entire 2024 season.
 
 ```{r}
 #| warning: false
@@ -1018,20 +1019,19 @@ We can let x be any positive integer. As an example, we will consider the probab
 x = 5
 ```
 
-
-450 class:
+<u>450 class</u>:
 
 ```{r}
 round(matrix450_2 %^% x, 2)
 ```
 
-250 class:
+<u>250 class</u>:
 
 ```{r}
 round(matrix250_2 %^% x, 2)
 ```
 
-WMX class:
+<u>WMX class</u>:
 
 ```{r}
 round(matrixwmx_2 %^% x, 2)
@@ -1039,7 +1039,7 @@ round(matrixwmx_2 %^% x, 2)
 
 **Q3**: Do passing probabilities themselves change over the course of a moto?
 
-To narrow the focus of this problem, we will consider how the probability of staying in 1-5 position group changes throughout a moto.
+To narrow the scope of this problem, we will consider how the probability of staying in 1-5 position group changes throughout a moto.
 
 ```{r}
 #| warning: false
@@ -1094,7 +1094,9 @@ The bold line is the line of best fit from local polynomial regression. A big ta
 
 **Q4**: What is the probability of starting in place X and finishing the moto in place Y?
 
-450 class:
+We define the starting place as the place the rider is in after the first lap of the moto.
+
+<u>450 class</u>:
 
 ```{r}
 #| warning: false
@@ -1200,7 +1202,7 @@ ggplot(sf_450, aes(Var1, Var2, fill = Freq)) +
        fill = "Probability")
 ```
 
-250 class:
+<u>250 class</u>:
 
 ```{r}
 #| warning: false
@@ -1311,7 +1313,7 @@ ggplot(sf_250, aes(Var1, Var2, fill = Freq)) +
        fill = "Probability")
 ```
 
-WMX class:
+<u>WMX class</u>:
 
 ```{r}
 #| warning: false
@@ -1421,9 +1423,9 @@ ggplot(sf_wmx, aes(Var1, Var2, fill = Freq)) +
 
 Do riders get more tired as the moto goes on? We can check this by checking whether lap times increase with lap number?
 
-We filter out the first lap since it is not a full lap of the moto. 
+We filter out the first lap since it is not a full lap of the moto.
 
-450 class:
+<u>450 class</u>:
 
 We also filter out lap times over 200 seconds as these are outliers and might affect the model.
 
@@ -1450,7 +1452,7 @@ all_2024_complete |>
              slope = "Slope")
 ```
 
-This shows that over the course of motos, lap times of riders are likely to increase. This is an indication of fatique. Note that the moto 2-2 ended early due to Dylan Wright's fall so rider fatigue was unlikely to kick in. 
+This shows that over the course of motos, lap times of riders are likely to increase. This is an indication of fatique. Note that the moto 2-2 ended early due to Dylan Wright's fall so rider fatigue was unlikely to kick in.
 
 Here are the average lap times by lap for each moto:
 
@@ -1470,7 +1472,7 @@ all_2024_complete |>
 
 This shows that average lap times are increasing up until the last couple of laps of the moto. I intuit that this is for a couple of reasons. First, we need to consider survivorship bias. Because lapping other riders exists, the final couple of lap times are only going to include the top riders in that moto, making the average lap time much faster here. Second, at the end of a moto, riders are giving it everything they can as they know the race is ending soon.
 
-250 class:
+<u>250 class</u>:
 
 We also filter out lap times over 250 seconds as these are outliers and might affect the model.
 
@@ -1517,7 +1519,7 @@ all_2024_complete |>
 
 This shows that average lap times are increasing up until the last couple of laps of the moto, as in the 450 class.
 
-WMX class:
+<u>WMX class</u>:
 
 We also filter out lap times over 250 seconds as these are outliers and might affect the model.
 
@@ -1564,9 +1566,9 @@ all_2024_complete |>
 
 ## 4.4 Rider rivalries
 
-Which two riders in each class battled the most throughout the season? In other words, add up the number of laps where the behind times between adjacent pairs of riders is less than 3 seconds. Which pair spend the most laps in this state?
+Which two riders in each class battled the most throughout the season? In other words, add up the number of laps where the behind times between adjacent pairs of riders is less than 2 seconds. Which pair spend the most laps in this state?
 
-450 class:
+<u>450 class</u>:
 
 ```{r}
 #| warning: false
@@ -1587,7 +1589,7 @@ gaps_450_2 <- gaps_450_1 |>
          rider.y, total_time.y, next_place) |>
   mutate(diff = total_time.x - total_time.y) |>
   drop_na(rider.y) |>
-  filter(diff >= -3)
+  filter(diff >= -2)
 
 rival_pairs_450 <- gaps_450_2 |> 
   select(rider.x, rider.y) |>
@@ -1606,7 +1608,7 @@ rival_pairs_450 |>
   
 ```
 
-250 class:
+<u>250 class</u>:
 
 ```{r}
 #| warning: false
@@ -1627,7 +1629,7 @@ gaps_250_2 <- gaps_250_1 |>
          rider.y, total_time.y, next_place) |>
   mutate(diff = total_time.x - total_time.y) |>
   drop_na(rider.y) |>
-  filter(diff >= -3)
+  filter(diff >= -2)
 
 rival_pairs_250 <- gaps_250_2 |> 
   select(rider.x, rider.y) |>
@@ -1646,7 +1648,7 @@ rival_pairs_250 |>
   
 ```
 
-WMX class:
+<u>WMX class</u>:
 
 ```{r}
 #| warning: false
@@ -1667,7 +1669,7 @@ gaps_wmx_2 <- gaps_wmx_1 |>
          rider.y, total_time.y, next_place) |>
   mutate(diff = total_time.x - total_time.y) |>
   drop_na(rider.y) |>
-  filter(diff >= -3)
+  filter(diff >= -2)
 
 rival_pairs_wmx <- gaps_wmx_2 |> 
   select(rider.x, rider.y) |>
@@ -1802,6 +1804,14 @@ The WMX class was not included in this analysis since there were technically thr
 
 ```{r}
 #| warning: false
+all_2024_finish <- all_2024_complete |>
+  filter(! race_id %in% c("wmx_2024_41", "wmx_2024_42")) |>
+  filter(lap == 1) |>
+  select(rider, finish, place, race_id, class) |>
+  group_by(rider, class) |>
+  summarize(avg_finish = round(mean(finish), 2)) |>
+  ungroup()
+
 all_2024_poschange <- all_2024_complete |>
   filter(! race_id %in% c("wmx_2024_41", "wmx_2024_42")) |>
   mutate(race_id_name = paste(race_id, rider, sep = "_")) |>
@@ -1818,13 +1828,13 @@ all_2024_poschange <- all_2024_complete |>
   group_by(rider, class) |>
   summarize(total_motos = n_distinct(race_id),
             total_passes = sum(places_gain),
-            avg_finish = round(mean(finish),2),
             passes_per_moto = round(total_passes/total_motos,2)) |>
   arrange(desc(passes_per_moto)) |>
-  ungroup()
+  ungroup() |>
+  left_join(all_2024_finish)
 ```
 
-450 class:
+<u>450 class</u>:
 
 ```{r}
 #| warning: false
@@ -1843,7 +1853,7 @@ all_2024_poschange |>
              passes_per_moto = "Passes/Moto")
 ```
 
-250 class:
+<u>250 class</u>:
 
 ```{r}
 #| warning: false
@@ -1862,7 +1872,7 @@ all_2024_poschange |>
              passes_per_moto = "Passes/Moto")
 ```
 
-WMX class:
+<u>WMX class</u>:
 
 ```{r}
 #| warning: false
@@ -1880,7 +1890,6 @@ all_2024_poschange |>
              avg_finish = "Average Finish",
              passes_per_moto = "Passes/Moto")
 ```
-
 
 ```{r}
 #| warning: false
@@ -1895,13 +1904,13 @@ ggplot(all_2024_poschange,
        color = "Class")
 ```
 
-There is lots of useful insight from this graph. First, we see a similar pattern for all three classes. The riders who finish near the front are not making many passes. They usually have good starts and stay in the front throughout the moto. The riders who finish near the rear are not making many passes. They usually have poor starts and stay in the back throughout the moto. The most passing occurs in the middle of pack. 
+There is lots of useful insight from this graph. First, we see a similar pattern for all three classes. The riders who finish near the front are not making many passes. They usually have good starts and stay in the front throughout the moto. The riders who finish near the rear are not making many passes. They usually have poor starts and stay in the back throughout the moto. The most passing occurs in the middle of pack.
 
-Second, we see that the 250 class has the most passing and the WMX class has the least amount of passing. 
+Second, we see that the 250 class has the most passing and the WMX class has the least amount of passing.
 
 ## 4.7 Best starters
 
-Unfortunately we don't access to any holeshot data, so we define the start variable as the rider's place after the first lap. 
+As before, since we don't access to any holeshot data, we define the start variable as the rider's place after the first lap.
 
 ```{r}
 #| warning: false
@@ -1916,7 +1925,7 @@ all_2024_startfinish <- all_2024_complete |>
   ungroup()
 ```
 
-450 class:
+<u>450 class</u>:
 
 ```{r}
 #| warning: false
@@ -1934,7 +1943,7 @@ all_2024_startfinish |>
              avg_finish = "Average Finish")
 ```
 
-250 class:
+<u>250 class</u>:
 
 ```{r}
 #| warning: false
@@ -1952,7 +1961,7 @@ all_2024_startfinish |>
              avg_finish = "Average Finish")
 ```
 
-WMX class:
+<u>WMX class</u>:
 
 ```{r}
 #| warning: false
@@ -1970,9 +1979,9 @@ all_2024_startfinish |>
              avg_finish = "Average Finish")
 ```
 
-We can see that those who start strong often finish strong. For the 250 and 450 class, the best starter was also the series champion. 
+We can see that those who start strong often finish strong. For the 250 and 450 class, the best starter was also the series champion.
 
-We can also see in which direction the rider usually heads after the start. If the average finish is higher than the average start, the rider usually drops back. If the average finish is lower than the average start, the rider usually climbs up. However, it is important to note that a rider who starts well usually has no place to go but down. This is why Jess Pettis has an average finish below his average start because he starts so many motos in the lead.
+We can also see in which direction the rider usually heads after the start. If the average finish is higher than the average start, the rider usually drops back. If the average finish is lower than the average start, the rider usually climbs up. However, it is important to note that a rider who starts well usually has no place to go but down. This is why Jess Pettis has an average finish below his average start because he starts most motos in the lead.
 
 ## 4.8 Lap consistency
 
@@ -1992,12 +2001,12 @@ moto_consistency <- function(input_raceid) {
     labs(x = "Lap Time",
          y = "Density",
          color = "Rider",
-         title = "450 Class - Rd 1 - Moto 1")
+         title = "450 class - Rd 1 - Moto 1")
 }
 moto_consistency("450_2024_1")
 ```
 
-The central tendency of the race winner, Dylan Wright, is the further to the left, indicating that he had the fastest lap times. However, Wright has the flattest curve, indicating a lack of consistency in this moto. The curve of Josiah Natzke is the tallest, which shows that he had the most consistent lap times, even if they weren't the fastest in the field. 
+The central tendency of the race winner, Dylan Wright, is the further to the left, indicating that he had the fastest lap times. However, Wright also has the flattest curve, indicating a lack of consistency in this moto. The curve of Josiah Natzke is the tallest, which shows that he had the most consistent lap times, even if they weren't the fastest in the field.
 
 ## 4.9 Lap comparisons to race leader
 
@@ -2033,11 +2042,11 @@ lap_comparison <- function(input_raceid, input_rider) {
 lap_comparison("450_2024_1", "TANNER WARD")
 ```
 
-We can see that Ward had a slower start to this moto, putting in laps around 4-5 seconds behind the leader. But he comes on strong towards the end, even putting in some laps faster than the race leader Dylan Wright. 
+We can see that Ward had a slower start to this moto, putting in laps around 4-5 seconds behind the leader. But he comes on strong towards the end, even putting in some laps faster than the race leader Dylan Wright.
 
 ## 4.10 Win probability model
 
-If we know how many laps are left, what place a rider is positioned in, and how far they are behind the leader, we can predict the likelihood that they go on to win the race. 
+If we know how many laps are left, what place a rider is positioned in, and how far they are behind the leader, we can predict the likelihood that they go on to win the race.
 
 ```{r}
 #| warning: false
@@ -2062,9 +2071,10 @@ exp(coef(logistic_model))
 Because the p-value is less than 0.05, we can say that all included variables are statistically significant.
 
 Some interpretation:
--   For each additional lap left, the odds of winning decrease by 7%. Riders are more likely to win when there are fewer laps left.
--   For each increase in place number, the odds of winning decrease by 30.1%. Being in a higher place number lowers the chance of winning the moto.
--   For each additional second behind the leader, the odds of winning decrease by 27.4%. Being further behind the leader reduces the chances of winning. 
+
+- For each additional lap left, the odds of winning decrease by 7%. Riders are more likely to win when there are fewer laps left. 
+- For each increase in place number, the odds of winning decrease by 30%. Being in a higher place number lowers the chance of winning the moto. 
+- For each additional second behind the leader, the odds of winning decrease by 27%. Being further behind the leader reduces the chances of winning.
 
 Now, we can add win probability predictions to the data and see which riders average the highest win probability.
 
@@ -2105,11 +2115,9 @@ winning_model_data |>
              prob_diff = "Win Prob Difference")
 ```
 
-
-
 ## 4.11 Rider profiles
 
-450 class:
+<u>450 class</u>:
 
 ```{r}
 #| warning: false
@@ -2235,9 +2243,9 @@ profile("JESS PETTIS", "15", "450", moto_id_450)
 profile("TANNER WARD", "84", "450", moto_id_450)
 ```
 
-250 class:
+<u>250 class</u>:
 
-``` {r}
+```{r}
 #| warning: false
 
 moto_id_250 <- tibble(race_id = c("250_2024_1", "250_2024_2",
